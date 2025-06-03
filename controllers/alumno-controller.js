@@ -1,4 +1,5 @@
 const Alumno = require('../models/alumno-model');
+const Usuario = require('../models/usuario-model');
 
 exports.getAll = async (req, res) => {
   try {
@@ -17,9 +18,16 @@ exports.getById = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const nuevo = await Alumno.create(req.body);
+
+    await Usuario.update(
+      { rol: 'alumno' },
+      { where: { idUsuario: req.body.usuarioId } }
+    );
+
     res.status(201).json(nuevo);
   } catch (err) {
-    res.status(500).json({ error: 'Error al crear' });
+    console.error(err);
+    res.status(500).json({ error: 'Error al crear el alumno' });
   }
 };
 

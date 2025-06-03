@@ -5,7 +5,12 @@ const usuarioController = require('../controllers/usuario-controller');
 router.get('/', usuarioController.getAllUsuarios);
 router.get('/:id', usuarioController.getUsuarioById);
 router.post('/', usuarioController.createUsuario);
-router.put('/:id', usuarioController.updateUsuario);
+router.put('/:id', verifyToken, usuarioController.updateUsuario);
 router.delete('/:id', usuarioController.deleteUsuario);
+//auth
+router.post('/login', usuarioController.login);
+router.post('/reset-password', usuarioController.resetPassword);
+router.post('/change-password', verifyToken, usuarioController.changePassword);
+
 
 module.exports = router;

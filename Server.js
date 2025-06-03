@@ -12,8 +12,6 @@ app.use(express.json());
 app.use('/api/recetas', require('./routes/receta-routes'));
 app.use('/api/usuarios', require('./routes/usuario-routes'));
 app.use('/api/ingredientes', require('./routes/ingrediente-routes'));
-app.use('/api/cursos', require('./routes/curso-routes'));
-app.use('/api/alumnos', require('./routes/alumno-routes'));
 app.use('/api/multimedia', require('./routes/multimedia-routes'));
 app.use('/api/pasos', require('./routes/paso-routes'));
 app.use('/api/tipos-receta', require('./routes/tipoReceta-routes'));
@@ -27,6 +25,8 @@ app.use('/api/asistencia-cursos', require('./routes/asistenciaCurso-routes'));
 app.use('/api/cronograma-cursos', require('./routes/cronogramaCurso-routes'));
 app.use('/api/sedes', require('./routes/sede-routes'));
 app.use('/api/cursos', require('./routes/curso-routes'));
+app.use('/api/administradores', require('./routes/admin-routes'));
+
 
 
 
