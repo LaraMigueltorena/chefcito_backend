@@ -1,11 +1,17 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db-config');
+const Usuario = require('./usuario-model');
 
 const Alumno = sequelize.define('Alumno', {
   idAlumno: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
+  },
+  usuarioId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    unique: true
   },
   numeroTarjeta: DataTypes.STRING(100),
   dniFrente: DataTypes.TEXT,
@@ -16,5 +22,6 @@ const Alumno = sequelize.define('Alumno', {
   tableName: 'alumnos',
   timestamps: false
 });
+
 
 module.exports = Alumno;

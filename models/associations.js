@@ -7,8 +7,10 @@ const Ingrediente = require('./ingrediente-model');
 const Utilizado = require('./utilizado-model');
 const Unidad = require('./unidad-model');
 const Conversion = require('./conversion-model');
+const Alumno = require('./alumno-model');
+const Administrador = require('./admin-model');
 
-// 📌 Receta pertenece a Usuario y a TipoReceta
+// 📌 Receta pertenece a Usuario y TipoReceta
 Receta.belongsTo(Usuario, { foreignKey: 'idUsuario' });
 Receta.belongsTo(TipoReceta, { foreignKey: 'idTipo' });
 
@@ -23,16 +25,22 @@ Paso.hasMany(Multimedia, { foreignKey: 'idPaso' });
 // 📌 Utilizado pertenece a Receta e Ingrediente
 Utilizado.belongsTo(Receta, { foreignKey: 'idReceta' });
 Utilizado.belongsTo(Ingrediente, { foreignKey: 'idIngrediente' });
-
 Receta.hasMany(Utilizado, { foreignKey: 'idReceta' });
 Ingrediente.hasMany(Utilizado, { foreignKey: 'idIngrediente' });
 
-// 📌 Conversion pertenece a Unidad (origen y destino)
+// 📌 Conversion entre unidades
 Conversion.belongsTo(Unidad, { foreignKey: 'idUnidadOrigen', as: 'unidadOrigen' });
 Conversion.belongsTo(Unidad, { foreignKey: 'idUnidadDestino', as: 'unidadDestino' });
-
 Unidad.hasMany(Conversion, { foreignKey: 'idUnidadOrigen', as: 'conversionesDesde' });
 Unidad.hasMany(Conversion, { foreignKey: 'idUnidadDestino', as: 'conversionesHacia' });
+
+// 📌 Relaciones 1:1 Usuario ↔ Alumno
+Usuario.hasOne(Alumno, { foreignKey: 'usuarioId' });
+Alumno.belongsTo(Usuario, { foreignKey: 'usuarioId' });
+
+// 📌 Relaciones 1:1 Usuario ↔ Administrador
+Usuario.hasOne(Administrador, { foreignKey: 'usuarioId' });
+Administrador.belongsTo(Usuario, { foreignKey: 'usuarioId' });
 
 module.exports = {
   Receta,
@@ -43,5 +51,7 @@ module.exports = {
   Ingrediente,
   Utilizado,
   Unidad,
-  Conversion
+  Conversion,
+  Alumno,
+  Administrador
 };

@@ -9,6 +9,11 @@ const Usuario = sequelize.define('Usuario', {
   },
   mail: {
     type: DataTypes.STRING(100),
+    allowNull: false,
+    unique: true
+  },
+  password: {
+    type: DataTypes.STRING,
     allowNull: false
   },
   nickname: {
@@ -25,6 +30,10 @@ const Usuario = sequelize.define('Usuario', {
   },
   avatar: {
     type: DataTypes.TEXT
+  },
+  rol: {
+    type: DataTypes.STRING(20), // 'alumno' o 'admin'
+    allowNull: false
   }
 }, {
   tableName: 'usuarios',
