@@ -23,7 +23,5 @@ const Alumno = sequelize.define('Alumno', {
   timestamps: false
 });
 
-// Relación inversa
-Alumno.belongsTo(Usuario, { foreignKey: 'usuarioId', as: 'usuario' });
 
 module.exports = Alumno;
