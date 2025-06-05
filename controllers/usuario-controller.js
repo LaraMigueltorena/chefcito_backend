@@ -1,10 +1,13 @@
 const Usuario = require('../models/usuario-model');
 const Alumno = require('../models/alumno-model');
 const Admin = require('../models/admin-model');
+const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-// GET all
+const codigosVerificacion = {}; // temporal en memoria
+
+// GET /usuarios
 exports.getAllUsuarios = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll();
@@ -15,7 +18,7 @@ exports.getAllUsuarios = async (req, res) => {
   }
 };
 
-// GET one
+// GET /usuarios/:id
 exports.getUsuarioById = async (req, res) => {
   try {
     const usuario = await Usuario.findByPk(req.params.id);
@@ -26,7 +29,7 @@ exports.getUsuarioById = async (req, res) => {
   }
 };
 
-// POST
+// POST /usuarios
 exports.createUsuario = async (req, res) => {
   try {
     const { password, ...otrosCampos } = req.body;
@@ -40,12 +43,11 @@ exports.createUsuario = async (req, res) => {
 
     res.status(201).json(nuevo);
   } catch (err) {
-    res.status(500).json({ error: 'Error al crear el usuario' });
+    res.status(400).json({ error: 'Error al crear el usuario', detalles: err.message });
   }
 };
 
-
-// PUT
+// PUT /usuarios/:id
 exports.updateUsuario = async (req, res) => {
   try {
     const { id } = req.params;
@@ -76,7 +78,70 @@ exports.updateUsuario = async (req, res) => {
   }
 };
 
+// DELETE /usuarios/:id
+exports.deleteUsuario = async (req, res) => {
+  try {
+    const usuario = await Usuario.findByPk(req.params.id);
+    if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
 
+    await usuario.destroy();
+    res.json({ mensaje: 'Usuario eliminado correctamente' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al eliminar el usuario' });
+  }
+};
+
+// POST /usuarios/verificar-email
+exports.verificarEmailYAlias = async (req, res) => {
+  const { mail, nickname } = req.body;
+
+  try {
+    const existeMail = await Usuario.findOne({ where: { mail } });
+    const existeAlias = await Usuario.findOne({ where: { nickname } });
+
+    if (existeMail) return res.status(400).json({ error: 'El correo ya está registrado' });
+    if (existeAlias) return res.status(400).json({ error: 'El alias ya está en uso' });
+
+    const codigo = Math.floor(1000 + Math.random() * 9000);
+    codigosVerificacion[mail] = codigo;
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: 'Chefcito 🍳',
+      to: mail,
+      subject: 'Código de verificación',
+      text: `Tu código de verificación es: ${codigo}`
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ mensaje: 'Código enviado correctamente' });
+  } catch (err) {
+    console.error('Error al verificar email/alias:', err);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+};
+
+// POST /usuarios/verificar-codigo
+exports.verificarCodigo = async (req, res) => {
+  const { mail, codigo } = req.body;
+
+  if (codigosVerificacion[mail] && codigosVerificacion[mail] === parseInt(codigo)) {
+    delete codigosVerificacion[mail];
+    return res.json({ verificado: true });
+  }
+
+  return res.status(400).json({ error: 'Código incorrecto' });
+};
+
+// POST /usuarios/reset-password
 exports.resetPassword = async (req, res) => {
   const { mail, nuevaPassword } = req.body;
 
@@ -95,6 +160,7 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+// POST /usuarios/change-password
 exports.changePassword = async (req, res) => {
   const { actualPassword, nuevaPassword } = req.body;
   const usuarioId = req.user.id;
@@ -116,20 +182,7 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-
-
-// DELETE
-exports.deleteUsuario = async (req, res) => {
-  try {
-    const usuario = await Usuario.findByPk(req.params.id);
-    if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
-    await usuario.destroy();
-    res.json({ mensaje: 'Usuario eliminado correctamente' });
-  } catch (err) {
-    res.status(500).json({ error: 'Error al eliminar el usuario' });
-  }
-};
-
+// POST /usuarios/login
 exports.login = async (req, res) => {
   const { mail, password } = req.body;
 
