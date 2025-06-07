@@ -14,10 +14,12 @@ const Alumno = sequelize.define('Alumno', {
     unique: true
   },
   numeroTarjeta: DataTypes.STRING(100),
+  codigoSeguridad: DataTypes.STRING(3),
+  numeroDeTramite: DataTypes.STRING(100),
   dniFrente: DataTypes.TEXT,
   dniDorso: DataTypes.TEXT,
   nombre: DataTypes.STRING(100),
-  cuentaCorriente: DataTypes.FLOAT
+  apellido: DataTypes.STRING(100),
 }, {
   tableName: 'alumnos',
   timestamps: false
