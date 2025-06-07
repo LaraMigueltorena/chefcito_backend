@@ -3,12 +3,14 @@ const cors = require('cors');
 const sequelize = require('./config/db-config');
 require('dotenv').config();
 
-
 const app = express();
 const port = 3000;
 
 app.use(cors());
-app.use(express.json());
+
+// 👇 Aumentamos el límite del cuerpo del request a 10MB
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
 // Rutas
 app.use('/api/recetas', require('./routes/receta-routes'));
@@ -29,11 +31,6 @@ app.use('/api/sedes', require('./routes/sede-routes'));
 app.use('/api/cursos', require('./routes/curso-routes'));
 app.use('/api/administradores', require('./routes/admin-routes'));
 
-
-
-
-
-
 // Test
 app.get('/', (req, res) => {
   res.send('¡Backend con Sequelize funcionando!');
@@ -43,8 +40,6 @@ app.get('/', (req, res) => {
 sequelize.authenticate()
   .then(() => {
     console.log('🟢 Conexión a la base de datos exitosa.');
-
-    // Solo sincroniza las tablas ya existentes, no las crea si no existen.
     return sequelize.sync();
   })
   .then(() => {
@@ -55,5 +50,5 @@ sequelize.authenticate()
   .catch((err) => {
     console.error('🔴 Error al conectar con la base de datos:', err);
   });
-  require('./models/associations');
 
+require('./models/associations');
