@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const codigosVerificacion = {}; // temporal en memoria
+const codigosRecuperacion = {};
 
 // GET /usuarios
 exports.getAllUsuarios = async (req, res) => {
@@ -91,6 +92,30 @@ exports.deleteUsuario = async (req, res) => {
   }
 };
 
+//POST /usuarios/sugerencias-alias
+exports.sugerenciasAlias = async (req, res) => {
+  const { base } = req.body;
+
+  if (!base) return res.status(400).json({ error: 'Alias base requerido' });
+
+  const sugerencias = [];
+  const intentosMax = 15;
+
+  for (let i = 0; i < intentosMax && sugerencias.length < 4; i++) {
+    const aleatorio = Math.floor(100 + Math.random() * 900);
+    const alias = `${base}${aleatorio}`;
+
+    const yaExiste = await Usuario.findOne({ where: { nickname: alias } });
+    if (!yaExiste) sugerencias.push(alias);
+  }
+
+  if (sugerencias.length === 0) {
+    return res.status(500).json({ error: 'No se pudieron generar sugerencias disponibles' });
+  }
+
+  return res.json({ sugerencias });
+};
+
 // POST /usuarios/verificar-email
 exports.verificarEmailYAlias = async (req, res) => {
   const { mail, nickname } = req.body;
@@ -139,6 +164,65 @@ exports.verificarCodigo = async (req, res) => {
   }
 
   return res.status(400).json({ error: 'Código incorrecto' });
+};
+
+// POST /usuarios/recuperar-codigo
+exports.enviarCodigoRecuperacion = async (req, res) => {
+  const { mail } = req.body;
+
+  try {
+    const usuario = await Usuario.findOne({ where: { mail } });
+    if (!usuario) return res.status(404).json({ error: 'Correo no registrado' });
+
+    const codigo = Math.floor(1000 + Math.random() * 9000);
+    const vencimiento = Date.now() + 30 * 60 * 1000; // 30 minutos
+
+    codigosRecuperacion[mail] = { codigo, vencimiento };
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: 'Chefcito 🍳',
+      to: mail,
+      subject: 'Recuperación de contraseña',
+      text: `Tu código de recuperación es: ${codigo}. Este código vence en 30 minutos.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ mensaje: 'Código de recuperación enviado correctamente' });
+  } catch (err) {
+    console.error('Error al enviar código de recuperación:', err);
+    res.status(500).json({ error: 'Error al enviar el código de recuperación' });
+  }
+};
+
+// POST /usuarios/verificar-codigo-recuperacion
+exports.verificarCodigoRecuperacion = async (req, res) => {
+  const { mail, codigo } = req.body;
+
+  const info = codigosRecuperacion[mail];
+  if (!info) return res.status(400).json({ error: 'No se solicitó recuperación para este mail' });
+
+  const ahora = Date.now();
+
+  if (ahora > info.vencimiento) {
+    delete codigosRecuperacion[mail];
+    return res.status(400).json({ error: 'Código expirado. Solicitá uno nuevo.' });
+  }
+
+  if (parseInt(codigo) !== info.codigo) {
+    return res.status(400).json({ error: 'Código incorrecto' });
+  }
+
+  delete codigosRecuperacion[mail];
+  return res.json({ verificado: true });
 };
 
 // POST /usuarios/reset-password
