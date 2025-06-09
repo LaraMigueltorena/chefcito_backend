@@ -30,6 +30,7 @@ app.use('/api/cronograma-cursos', require('./routes/cronogramaCurso-routes'));
 app.use('/api/sedes', require('./routes/sede-routes'));
 app.use('/api/cursos', require('./routes/curso-routes'));
 app.use('/api/administradores', require('./routes/admin-routes'));
+app.use('/uploads', express.static('uploads'));
 
 // Test
 app.get('/', (req, res) => {
