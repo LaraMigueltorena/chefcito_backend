@@ -7,11 +7,16 @@ const Curso = sequelize.define('Curso', {
     autoIncrement: true,
     primaryKey: true
   },
-  descripcion: DataTypes.STRING(100),
-  contenidos: DataTypes.TEXT,
-  requerimientos: DataTypes.TEXT,
+  Nombre: DataTypes.TEXT,
+  descripcionBreve: DataTypes.STRING(100),
+  descripcionCompleta: DataTypes.TEXT,
+  utensillos: DataTypes.TEXT,
+  insumos: DataTypes.TEXT,
+  dias: DataTypes.TEXT,
+  horario: DataTypes.TEXT,
   duracion: DataTypes.STRING(50),
   precio: DataTypes.FLOAT,
+  
   modalidad: DataTypes.STRING(50)
 }, {
   tableName: 'cursos',
