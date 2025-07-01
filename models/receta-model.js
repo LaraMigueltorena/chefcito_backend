@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db-config');
+const sequelize = require('../config/db-config'); // ESTA LÍNEA ES CLAVE
 
 const Receta = sequelize.define('Receta', {
   idReceta: {
@@ -28,6 +28,11 @@ const Receta = sequelize.define('Receta', {
   },
   idTipo: {
     type: DataTypes.INTEGER
+  },
+  estado: {
+    type: DataTypes.ENUM('en espera', 'aprobada', 'rechazada'),
+    allowNull: false,
+    defaultValue: 'en espera'
   }
 }, {
   tableName: 'recetas',

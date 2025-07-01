@@ -47,3 +47,17 @@ exports.deleteReceta = async (req, res) => {
   }
 };
 
+exports.createReceta = async (req, res) => {
+  try {
+    const nuevaReceta = await Receta.create({
+      ...req.body,
+      estado: 'en espera' // <-- importante para garantizar que siempre se aplique
+    });
+    res.status(201).json(nuevaReceta);
+  } catch (err) {
+    console.error('Error al crear receta:', err.message);
+    res.status(500).json({ error: 'Error al crear la receta' });
+  }
+};
+
+
