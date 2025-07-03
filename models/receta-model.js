@@ -40,3 +40,5 @@ const Receta = sequelize.define('Receta', {
 });
 
 module.exports = Receta;
+const Usuario = require('./usuario-model');
+Receta.belongsTo(Usuario, { foreignKey: 'idUsuario' });
