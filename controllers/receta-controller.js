@@ -18,10 +18,10 @@ exports.getAllRecetas = async (req, res) => {
     const recetas = await Receta.findAll({
       where: whereClause,
       order: [['idReceta', orden === 'asc' ? 'ASC' : 'DESC']],
-      include: {
-        model: Usuario,
-        attributes: ['nickname']
-      }
+      //include: {
+        //model: Usuario,
+        //attributes: ['nickname']
+      //}
     });
     
     res.json(recetas);
@@ -38,16 +38,17 @@ exports.getUltimasRecetas = async (req, res) => {
     const recetas = await Receta.findAll({
       order: [['idReceta', 'DESC']],
       limit: 3,
-      include: {
-        model: Usuario,
-        attributes: ['nickname']
-      }
+      //include: {
+        //model: Usuario,
+        //attributes: ['nickname']
+      //}
     });
     res.json(recetas);
   } catch (err) {
-    console.error('Error al obtener últimas recetas:', err.message);
-    res.status(500).json({ error: 'Error al obtener recetas recientes' });
-  }
+  console.error('Error al buscar recetas:', err);
+  res.status(500).json({ error: 'Error al buscar recetas' });
+}
+
 };
 
 // Obtener una receta por ID

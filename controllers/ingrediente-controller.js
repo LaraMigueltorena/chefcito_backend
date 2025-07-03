@@ -9,6 +9,28 @@ exports.getAll = async (req, res) => {
   }
 };
 
+exports.searchByName = async (req, res) => {
+  try {
+    const { nombre } = req.query;
+
+    if (!nombre) {
+      return res.status(400).json({ error: 'Falta el parámetro "nombre"' });
+    }
+
+    const ingredientes = await Ingrediente.findAll({
+      where: {
+        nombre: {
+          [require('sequelize').Op.like]: `%${nombre}%`
+        }
+      }
+    });
+
+    res.json(ingredientes);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al buscar ingredientes por nombre' });
+  }
+};
+
 exports.getById = async (req, res) => {
   const item = await Ingrediente.findByPk(req.params.id);
   item ? res.json(item) : res.status(404).json({ error: 'No encontrado' });
