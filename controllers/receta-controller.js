@@ -10,8 +10,16 @@ const Usuario = require('../models/usuario-model');
 // Obtener todas las recetas con filtros opcionales
 exports.getAllRecetas = async (req, res) => {
   try {
-    const { nombre, orden } = req.query;
-    const whereClause = nombre ? { nombreReceta: { [Op.like]: `%${nombre}%` } } : {};
+    const { nombre, orden, estado } = req.query;
+
+  const whereClause = {};
+  if (nombre) {
+    whereClause.nombreReceta = { [Op.like]: `%${nombre}%` };
+  }
+  if (estado) {
+    whereClause.estado = estado;
+  }
+
 
     const recetas = await Receta.findAll({
       where: whereClause,
@@ -77,11 +85,29 @@ exports.createReceta = async (req, res) => {
   }
 };
 
-// Actualizar receta
 exports.updateReceta = async (req, res) => {
   try {
     const receta = await Receta.findByPk(req.params.id);
     if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
+
+    // Validación de cambio de estado
+    if (req.body.estado) {
+      const estadoActual = receta.estado;
+      const nuevoEstado = req.body.estado;
+
+      const cambiosValidos = {
+        'en espera': ['aprobada', 'rechazada'],
+        'rechazada': ['aprobada'],
+        'aprobada': [] // No se puede cambiar una vez aprobada
+      };
+
+      if (!cambiosValidos[estadoActual].includes(nuevoEstado)) {
+        return res.status(400).json({
+          error: `No se puede cambiar el estado de "${estadoActual}" a "${nuevoEstado}"`
+        });
+      }
+    }
+
     await receta.update(req.body);
     res.json({ mensaje: 'Receta actualizada correctamente', receta });
   } catch (err) {
@@ -89,6 +115,7 @@ exports.updateReceta = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar la receta' });
   }
 };
+
 
 // Eliminar receta
 exports.deleteReceta = async (req, res) => {
@@ -123,6 +150,25 @@ exports.uploadFotoPrincipal = async (req, res) => {
     res.status(500).json({ error: 'Error al subir imagen' });
   }
 };
+
+// Obtener recetas en espera
+exports.getRecetasEnEspera = async (req, res) => {
+  try {
+    const recetas = await Receta.findAll({
+      where: { estado: 'en espera' },
+      order: [['idReceta', 'DESC']],
+      include: {
+        model: Usuario,
+        attributes: ['nickname']
+      }
+    });
+    res.json(recetas);
+  } catch (err) {
+    console.error('Error al obtener recetas en espera:', err.message);
+    res.status(500).json({ error: 'Error al obtener recetas en espera' });
+  }
+};
+
 
 // Cargar receta con imagen
 exports.uploadWithImage = async (req, res) => {

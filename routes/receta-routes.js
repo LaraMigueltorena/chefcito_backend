@@ -14,6 +14,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+router.get('/en-espera', recetaController.getRecetasEnEspera);
 router.get('/ultimas', recetaController.getUltimasRecetas);
 router.get('/:id', recetaController.getRecetaPorId);
 router.get('/', recetaController.getAllRecetas);

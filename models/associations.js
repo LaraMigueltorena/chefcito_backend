@@ -9,6 +9,8 @@ const Unidad = require('./unidad-model');
 const Conversion = require('./conversion-model');
 const Alumno = require('./alumno-model');
 const Administrador = require('./admin-model');
+const Favorito = require('./favorito-model');
+
 
 // 📌 Receta pertenece a Usuario y TipoReceta
 Receta.belongsTo(Usuario, { foreignKey: 'idUsuario' });
@@ -42,6 +44,13 @@ Alumno.belongsTo(Usuario, { foreignKey: 'usuarioId' });
 Usuario.hasOne(Administrador, { foreignKey: 'usuarioId' });
 Administrador.belongsTo(Usuario, { foreignKey: 'usuarioId' });
 
+Usuario.hasMany(Favorito, { foreignKey: 'idUsuario' });
+Favorito.belongsTo(Usuario, { foreignKey: 'idUsuario' });
+
+Receta.hasMany(Favorito, { foreignKey: 'idReceta' });
+Favorito.belongsTo(Receta, { foreignKey: 'idReceta' });
+
+
 module.exports = {
   Receta,
   Paso,
@@ -53,5 +62,6 @@ module.exports = {
   Unidad,
   Conversion,
   Alumno,
-  Administrador
+  Administrador,
+  Favorito
 };
