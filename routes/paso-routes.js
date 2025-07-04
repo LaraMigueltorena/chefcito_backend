@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const ctrl = require('../controllers/paso-controller');
+const pasoCtrl = require('../controllers/paso-controller'); // <- ESTA LÍNEA FALTABA
 
-router.get('/', ctrl.getAll);
-router.get('/:id', ctrl.getById);
-router.post('/', ctrl.create);
-router.put('/:id', ctrl.update);
-router.delete('/:id', ctrl.delete);
+router.get('/', pasoCtrl.getAll);
+router.get('/:id', pasoCtrl.getById);
+router.get('/por-receta/:idReceta', pasoCtrl.getByRecetaId); // <- NUEVA RUTA
+router.post('/', pasoCtrl.create);
+router.put('/:id', pasoCtrl.update);
+router.delete('/:id', pasoCtrl.delete);
 
 module.exports = router;

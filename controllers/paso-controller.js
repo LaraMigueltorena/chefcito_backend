@@ -36,3 +36,19 @@ exports.delete = async (req, res) => {
   await item.destroy();
   res.json({ mensaje: 'Eliminado' });
 };
+
+// Obtener pasos por idReceta
+exports.getByRecetaId = async (req, res) => {
+  try {
+    const { idReceta } = req.params;
+    const data = await Paso.findAll({
+      where: { idReceta },
+      order: [['nroPaso', 'ASC']],
+      include: ['Multimedia'], // Asegurate que la relación esté definida en el modelo
+    });
+    res.json(data);
+  } catch (err) {
+    console.error('Error al obtener pasos:', err);
+    res.status(500).json({ error: 'Error al obtener pasos de la receta' });
+  }
+};
