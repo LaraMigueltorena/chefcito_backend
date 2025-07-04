@@ -17,6 +17,7 @@ app.use('/api/recetas', require('./routes/receta-routes'));
 app.use('/api/usuarios', require('./routes/usuario-routes'));
 app.use('/api/ingredientes', require('./routes/ingrediente-routes'));
 app.use('/api/multimedia', require('./routes/multimedia-routes'));
+app.use('/uploads', express.static('uploads'));
 app.use('/api/pasos', require('./routes/paso-routes'));
 app.use('/api/tipos-receta', require('./routes/tipoReceta-routes'));
 app.use('/api/utilizados', require('./routes/utilizado-routes'));
