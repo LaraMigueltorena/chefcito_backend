@@ -9,6 +9,8 @@ const Unidad = require('./unidad-model');
 const Conversion = require('./conversion-model');
 const Alumno = require('./alumno-model');
 const Administrador = require('./admin-model');
+const Favorito = require('./favorito-model');
+
 
 const Curso = require('./curso-model');
 const CronogramaCurso = require('./cronogramaCurso-model');
@@ -46,6 +48,7 @@ Alumno.belongsTo(Usuario, { foreignKey: 'usuarioId' });
 Usuario.hasOne(Administrador, { foreignKey: 'usuarioId' });
 Administrador.belongsTo(Usuario, { foreignKey: 'usuarioId' });
 
+
 // 📌 NUEVO: Curso tiene muchos CronogramaCurso
 Curso.hasMany(CronogramaCurso, { foreignKey: 'idCurso' });
 CronogramaCurso.belongsTo(Curso, { foreignKey: 'idCurso' });
@@ -53,6 +56,12 @@ CronogramaCurso.belongsTo(Curso, { foreignKey: 'idCurso' });
 // 📌 NUEVO: CronogramaCurso tiene muchos EstadoCurso
 CronogramaCurso.hasMany(EstadoCurso, { foreignKey: 'idCronograma' });
 EstadoCurso.belongsTo(CronogramaCurso, { foreignKey: 'idCronograma' });
+
+Usuario.hasMany(Favorito, { foreignKey: 'idUsuario' });
+Favorito.belongsTo(Usuario, { foreignKey: 'idUsuario' });
+
+Receta.hasMany(Favorito, { foreignKey: 'idReceta' });
+Favorito.belongsTo(Receta, { foreignKey: 'idReceta' });
 
 module.exports = {
   Receta,
@@ -68,5 +77,7 @@ module.exports = {
   Administrador,
   Curso,
   CronogramaCurso,
-  EstadoCurso
+  EstadoCurso,
+  Favorito
+
 };
