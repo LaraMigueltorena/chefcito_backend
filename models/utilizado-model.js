@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db-config');
 
+
 const Utilizado = sequelize.define('Utilizado', {
   idUtilizado: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   idReceta: DataTypes.INTEGER,
@@ -8,6 +9,7 @@ const Utilizado = sequelize.define('Utilizado', {
   cantidad: DataTypes.FLOAT,
   unidad: DataTypes.STRING(50),
   observaciones: DataTypes.TEXT
+  
 }, {
   tableName: 'utilizados',
   timestamps: false
