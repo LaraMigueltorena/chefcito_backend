@@ -198,3 +198,61 @@ exports.uploadWithImage = async (req, res) => {
     res.status(500).json({ error: 'Error al crear receta con imagen' });
   }
 };
+
+// Obtener todas las recetas de un usuario por su ID
+exports.getRecetasPorUsuario = async (req, res) => {
+  try {
+    const { idUsuario } = req.params;
+
+    const recetas = await Receta.findAll({
+      where: { idUsuario },
+      order: [['idReceta', 'DESC']],
+      include: {
+        model: Usuario,
+        attributes: ['nickname']
+      }
+    });
+
+    res.json(recetas);
+  } catch (err) {
+    console.error('Error al obtener recetas del usuario:', err.message);
+    res.status(500).json({ error: 'Error al obtener recetas del usuario' });
+  }
+};
+
+exports.updateWithImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const receta = await Receta.findByPk(id);
+    if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
+
+    const {
+      nombreReceta,
+      descripcionReceta,
+      porciones,
+      cantidadPersonas,
+      idTipo
+    } = req.body;
+
+    const fotoPrincipal = req.file
+      ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+      : receta.fotoPrincipal;
+
+    const estado = 'en espera';
+
+    await receta.update({
+      nombreReceta,
+      descripcionReceta,
+      porciones,
+      cantidadPersonas,
+      idTipo,
+      fotoPrincipal,
+      estado,
+    });
+
+    res.json({ mensaje: 'Receta actualizada correctamente', receta });
+  } catch (error) {
+    console.error('Error al actualizar receta con imagen:', error);
+    res.status(500).json({ error: 'Error al actualizar la receta con imagen' });
+  }
+};
