@@ -11,10 +11,10 @@ const Alumno = require('./alumno-model');
 const Administrador = require('./admin-model');
 const Favorito = require('./favorito-model');
 
-
 const Curso = require('./curso-model');
 const CronogramaCurso = require('./cronogramaCurso-model');
 const EstadoCurso = require('./estadoCurso-model');
+const Sede = require('./sede-model'); // ✅ IMPORTANTE: asegúrate de importar Sede
 
 // 📌 Receta pertenece a Usuario y TipoReceta
 Receta.belongsTo(Usuario, { foreignKey: 'idUsuario' });
@@ -40,23 +40,27 @@ Conversion.belongsTo(Unidad, { foreignKey: 'idUnidadDestino', as: 'unidadDestino
 Unidad.hasMany(Conversion, { foreignKey: 'idUnidadOrigen', as: 'conversionesDesde' });
 Unidad.hasMany(Conversion, { foreignKey: 'idUnidadDestino', as: 'conversionesHacia' });
 
-// 📌 Relaciones 1:1 Usuario ↔ Alumno
+// 📌 Usuario tiene Alumno 1:1
 Usuario.hasOne(Alumno, { foreignKey: 'usuarioId' });
 Alumno.belongsTo(Usuario, { foreignKey: 'usuarioId' });
 
-// 📌 Relaciones 1:1 Usuario ↔ Administrador
+// 📌 Usuario tiene Administrador 1:1
 Usuario.hasOne(Administrador, { foreignKey: 'usuarioId' });
 Administrador.belongsTo(Usuario, { foreignKey: 'usuarioId' });
 
-
-// 📌 NUEVO: Curso tiene muchos CronogramaCurso
+// 📌 Curso tiene muchos CronogramaCurso
 Curso.hasMany(CronogramaCurso, { foreignKey: 'idCurso' });
 CronogramaCurso.belongsTo(Curso, { foreignKey: 'idCurso' });
 
-// 📌 NUEVO: CronogramaCurso tiene muchos EstadoCurso
+// ✅ Sede tiene muchos CronogramaCurso
+Sede.hasMany(CronogramaCurso, { foreignKey: 'idSede' });
+CronogramaCurso.belongsTo(Sede, { foreignKey: 'idSede' });
+
+// 📌 CronogramaCurso tiene muchos EstadoCurso
 CronogramaCurso.hasMany(EstadoCurso, { foreignKey: 'idCronograma' });
 EstadoCurso.belongsTo(CronogramaCurso, { foreignKey: 'idCronograma' });
 
+// 📌 Favorito entre Usuario y Receta
 Usuario.hasMany(Favorito, { foreignKey: 'idUsuario' });
 Favorito.belongsTo(Usuario, { foreignKey: 'idUsuario' });
 
@@ -78,6 +82,6 @@ module.exports = {
   Curso,
   CronogramaCurso,
   EstadoCurso,
+  Sede,         
   Favorito
-
 };

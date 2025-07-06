@@ -7,7 +7,8 @@ const CronogramaCurso = sequelize.define('CronogramaCurso', {
   idCurso: DataTypes.INTEGER,
   fechaInicio: DataTypes.DATE,
   fechaFin: DataTypes.DATE,
-  vacantesDisponibles: DataTypes.INTEGER
+  vacantesDisponibles: DataTypes.INTEGER,
+  promocion: DataTypes.FLOAT,
 }, {
   tableName: 'cronogramaCursos',
   timestamps: false
