@@ -3,6 +3,7 @@ const sequelize = require('../config/db-config');
 const Curso = require('../models/curso-model');
 const CronogramaCurso = require('../models/cronogramaCurso-model');
 const EstadoCurso = require('../models/estadoCurso-model');
+const Sede = require('../models/sede-model'); // ✅ Asegúrate de tenerlo importado
 
 exports.getAll = async (req, res) => {
   try {
@@ -55,15 +56,23 @@ exports.update = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
-    const item = await EstadoCurso.findByPk(req.params.id);
-    if (!item) return res.status(404).json({ error: 'No encontrado' });
+    const estado = await EstadoCurso.findByPk(req.params.id);
+    if (!estado) return res.status(404).json({ error: 'EstadoCurso no encontrado' });
 
-    await item.destroy();
-    res.json({ mensaje: 'estadoCurso eliminado' });
+    const cronograma = await CronogramaCurso.findByPk(estado.idCronograma);
+    if (cronograma) {
+      cronograma.vacantesDisponibles += 1;
+      await cronograma.save();
+    }
+
+    await estado.destroy();
+    res.json({ mensaje: 'Desinscripción correcta, vacante devuelta' });
   } catch (err) {
-    res.status(500).json({ error: 'Error al eliminar estadoCurso' });
+    console.error(err);
+    res.status(500).json({ error: 'Error al eliminar EstadoCurso' });
   }
 };
+
 
 exports.getByAlumno = async (req, res) => {
   try {
@@ -116,7 +125,7 @@ exports.getEnCurso = async (req, res) => {
       },
       include: [{
         model: CronogramaCurso,
-        include: [Curso]
+        include: [Curso, Sede] // ✅ Incluye la Sede
       }]
     });
 
@@ -138,7 +147,7 @@ exports.getFinalizados = async (req, res) => {
       },
       include: [{
         model: CronogramaCurso,
-        include: [Curso]
+        include: [Curso, Sede] // ✅ Incluye la Sede también para finalizados
       }]
     });
 
@@ -189,5 +198,3 @@ exports.inscribirAlumno = async (req, res) => {
     res.status(400).json({ error: err.message || 'Error al inscribir alumno' });
   }
 };
-
-
