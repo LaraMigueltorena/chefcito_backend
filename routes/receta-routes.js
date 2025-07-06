@@ -28,5 +28,6 @@ router.put('/:id', recetaController.updateReceta); // actualizar sin imagen
 router.put('/upload/:id', upload.single('fotoPrincipal'), recetaController.updateWithImage);
 
 router.delete('/:id', recetaController.deleteReceta);
+router.get('/por-tipo/:idTipo', recetaController.getRecetasPorTipo);
 
 module.exports = router;

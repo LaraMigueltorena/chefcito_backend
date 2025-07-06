@@ -256,3 +256,24 @@ exports.updateWithImage = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar la receta con imagen' });
   }
 };
+
+// Obtener recetas por idTipo (tipo de comida)
+exports.getRecetasPorTipo = async (req, res) => {
+  try {
+    const { idTipo } = req.params;
+
+    const recetas = await Receta.findAll({
+      where: { idTipo, estado: 'aprobada' },
+      include: {
+        model: Usuario,
+        attributes: ['nickname']
+      },
+      order: [['idReceta', 'DESC']]
+    });
+
+    res.json(recetas);
+  } catch (error) {
+    console.error('Error al obtener recetas por tipo:', error.message);
+    res.status(500).json({ error: 'Error al obtener recetas por tipo' });
+  }
+};

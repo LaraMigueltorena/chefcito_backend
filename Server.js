@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
 // Rutas
 app.use('/api/favorito', require('./routes/favorito-routes'));
+app.use('/api/conversiones', require('./routes/conversion-routes'));
 app.use('/api/recetas', require('./routes/receta-routes'));
 app.use('/api/usuarios', require('./routes/usuario-routes'));
 app.use('/api/ingredientes', require('./routes/ingrediente-routes'));

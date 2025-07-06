@@ -17,13 +17,40 @@ exports.getById = async (req, res) => {
   item ? res.json(item) : res.status(404).json({ error: 'No encontrado' });
 };
 
-// Crear ingrediente
+// Crear ingrediente (evita duplicados y normaliza el nombre)
 exports.create = async (req, res) => {
   try {
-    const nuevo = await Ingrediente.create(req.body);
+    const nombreOriginal = req.body.nombre;
+
+    if (!nombreOriginal || typeof nombreOriginal !== 'string') {
+      return res.status(400).json({ error: 'Falta el nombre del ingrediente' });
+    }
+
+    const nombreLimpio = nombreOriginal.trim().toLowerCase();
+    const plural = nombreLimpio.endsWith('s') ? nombreLimpio : nombreLimpio + 's';
+    const singular = nombreLimpio.endsWith('s') ? nombreLimpio.slice(0, -1) : nombreLimpio;
+
+    // Buscar coincidencias con singular o plural
+    const existentes = await Ingrediente.findAll();
+
+    const coincidencia = existentes.find(i => {
+      const nombreBD = i.nombre?.trim().toLowerCase();
+      return (
+        nombreBD === nombreLimpio ||
+        nombreBD === plural ||
+        nombreBD === singular
+      );
+    });
+
+    if (coincidencia) {
+      return res.json(coincidencia); // ✅ Si ya existe, se devuelve
+    }
+
+    const nuevo = await Ingrediente.create({ nombre: nombreLimpio });
     res.status(201).json(nuevo);
   } catch (err) {
-    res.status(500).json({ error: 'Error al crear' });
+    console.error('Error al crear ingrediente:', err);
+    res.status(500).json({ error: 'Error al crear ingrediente' });
   }
 };
 
