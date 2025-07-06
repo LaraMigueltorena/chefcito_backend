@@ -80,3 +80,27 @@ exports.getByRecetaId = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener ingredientes de la receta' });
   }
 };
+
+// Obtener todas las recetas que usan un ingrediente específico
+exports.getRecetasPorIngrediente = async (req, res) => {
+  try {
+    const { idIngrediente } = req.params;
+
+    if (!idIngrediente) {
+      return res.status(400).json({ error: 'Falta el idIngrediente en los parámetros' });
+    }
+
+    const utilizados = await Utilizado.findAll({
+      where: { idIngrediente },
+      attributes: ['idReceta'], // Solo traemos el campo idReceta
+      group: ['idReceta'], // Agrupamos para evitar duplicados
+    });
+
+    const recetaIds = utilizados.map(u => u.idReceta);
+
+    res.json(recetaIds);
+  } catch (err) {
+    console.error('Error al obtener recetas por ingrediente:', err);
+    res.status(500).json({ error: 'Error al buscar recetas por ingrediente' });
+  }
+};

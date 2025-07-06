@@ -15,11 +15,34 @@ exports.getById = async (req, res) => {
   item ? res.json(item) : res.status(404).json({ error: 'No encontrado' });
 };
 
+// Crear unidad sin duplicar
 exports.create = async (req, res) => {
   try {
-    const nuevo = await Unidad.create(req.body);
-    res.status(201).json(nuevo);
+    const descripcionOriginal = req.body.descripcion;
+
+    if (!descripcionOriginal || typeof descripcionOriginal !== 'string') {
+      return res.status(400).json({ error: 'Falta la descripción de la unidad' });
+    }
+
+    const descripcionLimpia = descripcionOriginal.trim().toLowerCase();
+
+    // Buscar si ya existe una unidad con esa descripción (ignorando mayúsculas y espacios)
+    const unidadExistente = await Unidad.findOne({
+      where: Sequelize.where(
+        Sequelize.fn('trim', Sequelize.fn('lower', Sequelize.col('descripcion'))),
+        descripcionLimpia
+      )
+    });
+
+    if (unidadExistente) {
+      return res.json(unidadExistente); // ✅ Devuelve la unidad existente
+    }
+
+    // Crear nueva unidad si no existe
+    const nueva = await Unidad.create({ descripcion: descripcionLimpia });
+    res.status(201).json(nueva);
   } catch (err) {
+    console.error('Error al crear unidad:', err);
     res.status(500).json({ error: 'Error al crear Unidad' });
   }
 };
