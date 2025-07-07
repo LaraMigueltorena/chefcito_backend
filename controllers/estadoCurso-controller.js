@@ -158,7 +158,7 @@ exports.getFinalizados = async (req, res) => {
 };
 
 exports.inscribirAlumno = async (req, res) => {
-  const { idAlumno, idCronograma } = req.params;
+  const { idAlumno: idUsuario, idCronograma } = req.params;
 
   try {
     await sequelize.transaction(async (t) => {
@@ -169,17 +169,20 @@ exports.inscribirAlumno = async (req, res) => {
         throw new Error('No hay vacantes disponibles');
       }
 
+      // 👉 Verifica si ya existe inscripción para este usuario
       const yaExiste = await EstadoCurso.findOne({
-        where: { idAlumno, idCronograma },
+        where: { idAlumno: idUsuario, idCronograma },
         transaction: t,
       });
-      if (yaExiste) throw new Error('Ya existe inscripción para este alumno y cronograma');
+      if (yaExiste) throw new Error('Ya existe inscripción para este usuario y cronograma');
 
+      // Resta vacante
       cronograma.vacantesDisponibles -= 1;
       await cronograma.save({ transaction: t });
 
+      // ✅ Crea EstadoCurso con idAlumno = idUsuario
       await EstadoCurso.create(
-        { idAlumno, idCronograma, estado: 'en_curso' },
+        { idAlumno: idUsuario, idCronograma, estado: 'en_curso' },
         { transaction: t }
       );
     });
@@ -187,9 +190,10 @@ exports.inscribirAlumno = async (req, res) => {
     res.json({ mensaje: 'Inscripción correcta, vacantes actualizadas.' });
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err.message || 'Error al inscribir alumno' });
+    res.status(400).json({ error: err.message || 'Error al inscribir usuario' });
   }
 };
+
 
 // 🔥 NUEVO: Buscar idEstadoCurso por alumno + cronograma
 exports.getByAlumnoCronograma = async (req, res) => {
