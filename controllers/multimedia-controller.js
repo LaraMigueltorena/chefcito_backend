@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const Multimedia = require('../models/multimedia-model');
 
@@ -53,7 +54,6 @@ exports.uploadFile = async (req, res) => {
       tipo_contenido,
       extension: path.extname(file.originalname).replace('.', ''),
       urlContenido: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
-
     });
 
     res.status(201).json(nuevo);
@@ -76,20 +76,35 @@ exports.update = async (req, res) => {
   }
 };
 
-// Eliminar multimedia
+// ✅ Eliminar multimedia Y BORRAR EL ARCHIVO FÍSICO
 exports.delete = async (req, res) => {
   try {
     const item = await Multimedia.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: 'No encontrado' });
 
+    // Obtener la ruta local del archivo físico
+    const url = item.urlContenido;
+    const nombreArchivo = url.split('/uploads/')[1];
+    const rutaArchivo = path.join(__dirname, '..', 'uploads', nombreArchivo);
+
+    // Intentar borrar el archivo del sistema de archivos
+    fs.unlink(rutaArchivo, (err) => {
+      if (err) {
+        console.error('No se pudo borrar el archivo físico:', err);
+        // No detenemos la eliminación de BD por esto
+      }
+    });
+
+    // Borrar el registro en la base de datos
     await item.destroy();
-    res.json({ mensaje: 'Eliminado' });
+    res.json({ mensaje: 'Eliminado correctamente' });
   } catch (err) {
+    console.error('Error al eliminar multimedia:', err);
     res.status(500).json({ error: 'Error al eliminar multimedia' });
   }
 };
-// Obtener archivo multimedia por ID de paso
-// Obtener TODOS los archivos multimedia por ID de paso
+
+// Obtener todos los archivos multimedia por ID de paso
 exports.getByPasoId = async (req, res) => {
   try {
     const { idPaso } = req.params;
@@ -101,4 +116,3 @@ exports.getByPasoId = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener multimedia por paso' });
   }
 };
-
