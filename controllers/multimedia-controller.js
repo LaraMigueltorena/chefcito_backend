@@ -89,18 +89,16 @@ exports.delete = async (req, res) => {
   }
 };
 // Obtener archivo multimedia por ID de paso
+// Obtener TODOS los archivos multimedia por ID de paso
 exports.getByPasoId = async (req, res) => {
   try {
     const { idPaso } = req.params;
-    const archivo = await Multimedia.findOne({ where: { idPaso } });
+    const archivos = await Multimedia.findAll({ where: { idPaso } });
 
-    if (!archivo) {
-      return res.status(404).json({ error: 'No se encontró multimedia para este paso' });
-    }
-
-    res.json(archivo);
+    res.json(archivos); // Devuelve un array
   } catch (err) {
     console.error('Error al obtener multimedia por paso:', err);
     res.status(500).json({ error: 'Error al obtener multimedia por paso' });
   }
 };
+

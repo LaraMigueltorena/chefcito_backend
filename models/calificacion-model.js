@@ -6,7 +6,12 @@ const Calificacion = sequelize.define('Calificacion', {
   idUsuario: DataTypes.INTEGER,
   idReceta: DataTypes.INTEGER,
   calificacion: DataTypes.INTEGER,
-  comentarios: DataTypes.TEXT
+  comentarios: DataTypes.TEXT,
+  estado: {
+    type: DataTypes.ENUM('en espera', 'aprobado', 'rechazado'),
+    allowNull: true,
+    defaultValue: null
+  }
 }, {
   tableName: 'calificaciones',
   timestamps: false
