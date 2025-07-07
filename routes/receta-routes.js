@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
-
+router.get('/existe', recetaController.verificarRecetaPorNombreYUsuario);
 router.get('/usuario/:idUsuario', recetaController.getRecetasPorUsuario);
 router.get('/en-espera', recetaController.getRecetasEnEspera);
 router.get('/ultimas', recetaController.getUltimasRecetas);
@@ -29,5 +29,7 @@ router.put('/upload/:id', upload.single('fotoPrincipal'), recetaController.updat
 
 router.delete('/:id', recetaController.deleteReceta);
 router.get('/por-tipo/:idTipo', recetaController.getRecetasPorTipo);
+
+
 
 module.exports = router;

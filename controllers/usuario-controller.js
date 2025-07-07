@@ -296,3 +296,24 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 };
+
+exports.actualizarConexion = async (req, res) => {
+  const { id } = req.params;
+  const { conexion } = req.body;
+
+  if (!['internet', 'datos', 'sin'].includes(conexion)) {
+    return res.status(400).json({ error: 'Valor de conexión inválido' });
+  }
+
+  try {
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+    usuario.conexion = conexion;
+    await usuario.save();
+
+    res.json({ mensaje: 'Conexión actualizada', conexion: usuario.conexion });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al actualizar conexión' });
+  }
+};

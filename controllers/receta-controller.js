@@ -4,6 +4,9 @@ const path = require('path');
 const { Op } = require('sequelize');
 const Receta = require('../models/receta-model');
 const Usuario = require('../models/usuario-model');
+const Paso = require('../models/paso-model');
+const Utilizado = require('../models/utilizado-model');
+const Valoracion = require('../models/calificacion-model');
 
 
 
@@ -96,10 +99,11 @@ exports.updateReceta = async (req, res) => {
       const nuevoEstado = req.body.estado;
 
       const cambiosValidos = {
-        'en espera': ['aprobada', 'rechazada'],
-        'rechazada': ['aprobada'],
-        'aprobada': [] // No se puede cambiar una vez aprobada
-      };
+      'en espera': ['aprobada', 'rechazada'],
+      'rechazada': ['aprobada'],
+      'aprobada': ['en espera'], // ✅ permite volver a revisión
+        };
+
 
       if (!cambiosValidos[estadoActual].includes(nuevoEstado)) {
         return res.status(400).json({
@@ -117,18 +121,43 @@ exports.updateReceta = async (req, res) => {
 };
 
 
-// Eliminar receta
+
+
+const Multimedia = require('../models/multimedia-model'); // nuevo
+
 exports.deleteReceta = async (req, res) => {
   try {
-    const receta = await Receta.findByPk(req.params.id);
-    if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
+    const idReceta = req.params.id;
+    console.log('🧹 Eliminando receta y sus relaciones, ID:', idReceta);
+
+    const receta = await Receta.findByPk(idReceta);
+    if (!receta) {
+      return res.status(404).json({ error: 'Receta no encontrada' });
+    }
+
+    // Obtener pasos para borrar multimedia primero
+    const pasos = await Paso.findAll({ where: { idReceta } });
+
+    for (const paso of pasos) {
+      await Multimedia.destroy({ where: { idPaso: paso.idPaso } });
+    }
+
+    // Borrar valoraciones, utilizados y pasos
+    await Valoracion.destroy({ where: { idReceta } });
+    await Utilizado.destroy({ where: { idReceta } });
+    await Paso.destroy({ where: { idReceta } });
+
+    // Finalmente, borrar la receta
     await receta.destroy();
-    res.json({ mensaje: 'Receta eliminada correctamente' });
+
+    res.json({ mensaje: 'Receta y datos asociados eliminados correctamente' });
+
   } catch (err) {
-    console.error('Error al eliminar receta:', err.message);
+    console.error('💥 Error al eliminar receta:', err.message);
     res.status(500).json({ error: 'Error al eliminar la receta' });
   }
 };
+
 
 // Subir imagen principal
 exports.uploadFotoPrincipal = async (req, res) => {
@@ -277,3 +306,38 @@ exports.getRecetasPorTipo = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener recetas por tipo' });
   }
 };
+
+
+// Verificar si el usuario ya tiene una receta con ese nombre
+exports.verificarRecetaPorNombreYUsuario = async (req, res) => {
+  try {
+    const { idUsuario, nombreReceta } = req.query;
+
+    if (!idUsuario || !nombreReceta) {
+      return res.status(400).json({ error: 'Faltan parámetros requeridos' });
+    }
+
+    const recetaExistente = await Receta.findOne({
+      where: {
+        idUsuario,
+        nombreReceta: { [Op.like]: nombreReceta } // o [Op.iLike] si usás PostgreSQL
+      },
+      attributes: ['idReceta', 'nombreReceta']
+    });
+
+    if (recetaExistente) {
+      return res.json({
+        existe: true,
+        idReceta: recetaExistente.idReceta,
+        nombreReceta: recetaExistente.nombreReceta
+      });
+    } else {
+      return res.json({ existe: false });
+    }
+
+  } catch (error) {
+    console.error('Error al verificar existencia de receta:', error.message);
+    res.status(500).json({ error: 'Error al verificar existencia de receta' });
+  }
+};
+
