@@ -15,7 +15,6 @@ exports.getById = async (req, res) => {
   item ? res.json(item) : res.status(404).json({ error: 'No encontrado' });
 };
 
-// Crear unidad sin duplicar
 exports.create = async (req, res) => {
   try {
     const descripcionOriginal = req.body.descripcion;
@@ -26,7 +25,6 @@ exports.create = async (req, res) => {
 
     const descripcionLimpia = descripcionOriginal.trim().toLowerCase();
 
-    // Buscar si ya existe una unidad con esa descripción (ignorando mayúsculas y espacios)
     const unidadExistente = await Unidad.findOne({
       where: Sequelize.where(
         Sequelize.fn('trim', Sequelize.fn('lower', Sequelize.col('descripcion'))),
@@ -35,10 +33,9 @@ exports.create = async (req, res) => {
     });
 
     if (unidadExistente) {
-      return res.json(unidadExistente); // ✅ Devuelve la unidad existente
+      return res.json(unidadExistente); 
     }
-
-    // Crear nueva unidad si no existe
+    
     const nueva = await Unidad.create({ descripcion: descripcionLimpia });
     res.status(201).json(nueva);
   } catch (err) {
@@ -61,7 +58,6 @@ exports.delete = async (req, res) => {
   res.json({ mensaje: 'Eliminado' });
 };
 
-// 🔍 Buscar unidad por descripción exacta (ignora mayúsculas y espacios)
 exports.searchByDescripcion = async (req, res) => {
   try {
     const { descripcion } = req.query;

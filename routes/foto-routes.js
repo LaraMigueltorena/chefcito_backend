@@ -4,7 +4,6 @@ const ctrl = require('../controllers/foto-controller');
 const multer = require('multer');
 const path = require('path');
 
-// Configuración de multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
   filename: (req, file, cb) => {
@@ -15,14 +14,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Rutas estándar
 router.get('/', ctrl.getAll);
 router.get('/:id', ctrl.getById);
 router.post('/', ctrl.create);
 router.put('/:id', ctrl.update);
 router.delete('/:id', ctrl.delete);
-
-// Nueva ruta para subir archivo de imagen
 router.post('/upload', upload.single('archivo'), ctrl.uploadFoto);
 
 module.exports = router;

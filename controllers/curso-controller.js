@@ -1,6 +1,5 @@
 const Curso = require('../models/curso-model');
 
-// Obtener todos
 exports.getAll = async (req, res) => {
   try {
     const data = await Curso.findAll();
@@ -10,13 +9,11 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// Obtener uno por ID
 exports.getById = async (req, res) => {
   const item = await Curso.findByPk(req.params.id);
   item ? res.json(item) : res.status(404).json({ error: 'No encontrado' });
 };
 
-// Crear
 exports.create = async (req, res) => {
   try {
     const nuevo = await Curso.create(req.body);
@@ -26,7 +23,6 @@ exports.create = async (req, res) => {
   }
 };
 
-// Actualizar
 exports.update = async (req, res) => {
   const item = await Curso.findByPk(req.params.id);
   if (!item) return res.status(404).json({ error: 'No encontrado' });
@@ -34,7 +30,6 @@ exports.update = async (req, res) => {
   res.json({ mensaje: 'Actualizado', item });
 };
 
-// Eliminar
 exports.delete = async (req, res) => {
   const item = await Curso.findByPk(req.params.id);
   if (!item) return res.status(404).json({ error: 'No encontrado' });
@@ -54,8 +49,7 @@ exports.uploadImagen = async (req, res) => {
     if (!curso) {
       return res.status(404).json({ error: 'Curso no encontrado' });
     }
-
-    // ✅ Ahora la ruta apunta a uploads/cursos/...
+    
     curso.imagen = `/uploads/cursos/${req.file.filename}`;
     await curso.save();
 

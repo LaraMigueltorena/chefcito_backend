@@ -134,7 +134,7 @@ exports.getComentariosAprobadosPorReceta = async (req, res) => {
       where: {
         idReceta,
         estado: 'aprobado',
-        comentarios: { [require('sequelize').Op.ne]: '' }, // solo si tiene comentarios
+        comentarios: { [require('sequelize').Op.ne]: '' },
       },
       order: [['idCalificacion', 'DESC']],
     });

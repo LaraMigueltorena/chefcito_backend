@@ -16,9 +16,7 @@ const Curso = sequelize.define('Curso', {
   horario: DataTypes.TEXT,
   duracion: DataTypes.STRING(50),
   precio: DataTypes.FLOAT,
-  modalidad: DataTypes.STRING(50),
-
-  // ✅ NUEVO: campo para guardar la URL de la imagen del curso
+  modalidad: DataTypes.STRING(50),  
   imagen: {
     type: DataTypes.STRING,
     allowNull: true

@@ -3,7 +3,7 @@ const sequelize = require('../config/db-config');
 const Curso = require('../models/curso-model');
 const CronogramaCurso = require('../models/cronogramaCurso-model');
 const EstadoCurso = require('../models/estadoCurso-model');
-const Sede = require('../models/sede-model'); // ✅
+const Sede = require('../models/sede-model'); 
 
 exports.getAll = async (req, res) => {
   try {
@@ -168,19 +168,16 @@ exports.inscribirAlumno = async (req, res) => {
       if (cronograma.vacantesDisponibles <= 0) {
         throw new Error('No hay vacantes disponibles');
       }
-
-      // 👉 Verifica si ya existe inscripción para este usuario
+      
       const yaExiste = await EstadoCurso.findOne({
         where: { idAlumno: idUsuario, idCronograma },
         transaction: t,
       });
       if (yaExiste) throw new Error('Ya existe inscripción para este usuario y cronograma');
-
-      // Resta vacante
+      
       cronograma.vacantesDisponibles -= 1;
       await cronograma.save({ transaction: t });
-
-      // ✅ Crea EstadoCurso con idAlumno = idUsuario
+      
       await EstadoCurso.create(
         { idAlumno: idUsuario, idCronograma, estado: 'en_curso' },
         { transaction: t }
@@ -194,8 +191,6 @@ exports.inscribirAlumno = async (req, res) => {
   }
 };
 
-
-// 🔥 NUEVO: Buscar idEstadoCurso por alumno + cronograma
 exports.getByAlumnoCronograma = async (req, res) => {
   const { alumno, cronograma } = req.query;
 

@@ -15,8 +15,7 @@ exports.getById = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
-  try {
-    // ✅ Destructura solo los campos permitidos
+  try {    
     const {
       nombreSede,
       direccionSede,
@@ -42,8 +41,7 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   const item = await Sede.findByPk(req.params.id);
   if (!item) return res.status(404).json({ error: 'No encontrado' });
-
-  // ✅ Solo actualiza campos válidos
+  
   const {
     nombreSede,
     direccionSede,

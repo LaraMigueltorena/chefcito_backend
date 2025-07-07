@@ -1,7 +1,6 @@
 const Ingrediente = require('../models/ingrediente-model');
 const { Sequelize } = require('sequelize');
 
-// Obtener todos los ingredientes
 exports.getAll = async (req, res) => {
   try {
     const data = await Ingrediente.findAll();
@@ -11,13 +10,11 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// Obtener por ID
 exports.getById = async (req, res) => {
   const item = await Ingrediente.findByPk(req.params.id);
   item ? res.json(item) : res.status(404).json({ error: 'No encontrado' });
 };
 
-// Crear ingrediente (evita duplicados y normaliza el nombre)
 exports.create = async (req, res) => {
   try {
     const nombreOriginal = req.body.nombre;
@@ -30,7 +27,6 @@ exports.create = async (req, res) => {
     const plural = nombreLimpio.endsWith('s') ? nombreLimpio : nombreLimpio + 's';
     const singular = nombreLimpio.endsWith('s') ? nombreLimpio.slice(0, -1) : nombreLimpio;
 
-    // Buscar coincidencias con singular o plural
     const existentes = await Ingrediente.findAll();
 
     const coincidencia = existentes.find(i => {
@@ -43,7 +39,7 @@ exports.create = async (req, res) => {
     });
 
     if (coincidencia) {
-      return res.json(coincidencia); // ✅ Si ya existe, se devuelve
+      return res.json(coincidencia); 
     }
 
     const nuevo = await Ingrediente.create({ nombre: nombreLimpio });
@@ -54,7 +50,6 @@ exports.create = async (req, res) => {
   }
 };
 
-// Actualizar ingrediente
 exports.update = async (req, res) => {
   const item = await Ingrediente.findByPk(req.params.id);
   if (!item) return res.status(404).json({ error: 'No encontrado' });
@@ -62,7 +57,6 @@ exports.update = async (req, res) => {
   res.json({ mensaje: 'Actualizado', item });
 };
 
-// Eliminar ingrediente
 exports.delete = async (req, res) => {
   const item = await Ingrediente.findByPk(req.params.id);
   if (!item) return res.status(404).json({ error: 'No encontrado' });
@@ -82,7 +76,6 @@ exports.searchByExactName = async (req, res) => {
     const plural = nombreLimpio.endsWith('s') ? nombreLimpio : nombreLimpio + 's';
     const singular = nombreLimpio.endsWith('s') ? nombreLimpio.slice(0, -1) : nombreLimpio;
 
-    // Traer todos los ingredientes (se puede optimizar más adelante)
     const ingredientes = await Ingrediente.findAll();
 
     const coincidencia = ingredientes.find(i => {

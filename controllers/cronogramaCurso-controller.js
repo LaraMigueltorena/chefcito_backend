@@ -2,7 +2,6 @@ const CronogramaCurso = require('../models/cronogramaCurso-model');
 const Curso = require('../models/curso-model');
 const Sede = require('../models/sede-model');
 
-// ✅ Obtener TODOS los cronogramas con Curso y Sede asociados
 exports.getAll = async (req, res) => {
   try {
     const data = await CronogramaCurso.findAll({
@@ -18,7 +17,6 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// ✅ Obtener cronograma por ID con Curso y Sede
 exports.getById = async (req, res) => {
   try {
     const item = await CronogramaCurso.findByPk(req.params.id, {
@@ -38,7 +36,6 @@ exports.getById = async (req, res) => {
   }
 };
 
-// ✅ Crear cronograma
 exports.create = async (req, res) => {
   try {
     const {
@@ -66,7 +63,6 @@ exports.create = async (req, res) => {
   }
 };
 
-// ✅ Actualizar cronograma
 exports.update = async (req, res) => {
   try {
     const item = await CronogramaCurso.findByPk(req.params.id);
@@ -97,7 +93,6 @@ exports.update = async (req, res) => {
   }
 };
 
-// ✅ Eliminar cronograma
 exports.delete = async (req, res) => {
   try {
     const item = await CronogramaCurso.findByPk(req.params.id);
@@ -111,7 +106,6 @@ exports.delete = async (req, res) => {
   }
 };
 
-// ✅ Cronogramas por ID de Curso con Curso y Sede
 exports.getByCurso = async (req, res) => {
   try {
     const data = await CronogramaCurso.findAll({
@@ -128,7 +122,6 @@ exports.getByCurso = async (req, res) => {
   }
 };
 
-// ✅ Cronogramas por ID de Curso solo con Sede (opcional)
 exports.getSedesByCurso = async (req, res) => {
   try {
     const data = await CronogramaCurso.findAll({

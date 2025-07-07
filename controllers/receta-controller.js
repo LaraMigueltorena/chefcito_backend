@@ -1,5 +1,3 @@
-// 📁 controllers/receta-controller.js
-
 const path = require('path');
 const { Op } = require('sequelize');
 const Receta = require('../models/receta-model');
@@ -9,8 +7,6 @@ const Utilizado = require('../models/utilizado-model');
 const Valoracion = require('../models/calificacion-model');
 
 
-
-// Obtener todas las recetas con filtros opcionales
 exports.getAllRecetas = async (req, res) => {
   try {
     const { nombre, orden, estado } = req.query;
@@ -39,7 +35,6 @@ exports.getAllRecetas = async (req, res) => {
   }
 };
 
-// Obtener las 3 últimas recetas
 exports.getUltimasRecetas = async (req, res) => {
   try {
     const recetas = await Receta.findAll({
@@ -57,7 +52,6 @@ exports.getUltimasRecetas = async (req, res) => {
   }
 };
 
-// Obtener una receta por ID
 exports.getRecetaPorId = async (req, res) => {
   try {
     const receta = await Receta.findByPk(req.params.id, {
@@ -74,7 +68,6 @@ exports.getRecetaPorId = async (req, res) => {
   }
 };
 
-// Crear receta
 exports.createReceta = async (req, res) => {
   try {
     const nuevaReceta = await Receta.create({
@@ -92,8 +85,7 @@ exports.updateReceta = async (req, res) => {
   try {
     const receta = await Receta.findByPk(req.params.id);
     if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
-
-    // Validación de cambio de estado
+    
     if (req.body.estado) {
       const estadoActual = receta.estado;
       const nuevoEstado = req.body.estado;
@@ -101,7 +93,7 @@ exports.updateReceta = async (req, res) => {
       const cambiosValidos = {
       'en espera': ['aprobada', 'rechazada'],
       'rechazada': ['aprobada'],
-      'aprobada': ['en espera'], // ✅ permite volver a revisión
+      'aprobada': ['en espera'], 
         };
 
 
@@ -123,7 +115,7 @@ exports.updateReceta = async (req, res) => {
 
 
 
-const Multimedia = require('../models/multimedia-model'); // nuevo
+const Multimedia = require('../models/multimedia-model');
 
 exports.deleteReceta = async (req, res) => {
   try {
@@ -134,20 +126,17 @@ exports.deleteReceta = async (req, res) => {
     if (!receta) {
       return res.status(404).json({ error: 'Receta no encontrada' });
     }
-
-    // Obtener pasos para borrar multimedia primero
+    
     const pasos = await Paso.findAll({ where: { idReceta } });
 
     for (const paso of pasos) {
       await Multimedia.destroy({ where: { idPaso: paso.idPaso } });
     }
 
-    // Borrar valoraciones, utilizados y pasos
     await Valoracion.destroy({ where: { idReceta } });
     await Utilizado.destroy({ where: { idReceta } });
     await Paso.destroy({ where: { idReceta } });
 
-    // Finalmente, borrar la receta
     await receta.destroy();
 
     res.json({ mensaje: 'Receta y datos asociados eliminados correctamente' });
@@ -158,8 +147,6 @@ exports.deleteReceta = async (req, res) => {
   }
 };
 
-
-// Subir imagen principal
 exports.uploadFotoPrincipal = async (req, res) => {
   try {
     const { idReceta } = req.body;
@@ -180,7 +167,6 @@ exports.uploadFotoPrincipal = async (req, res) => {
   }
 };
 
-// Obtener recetas en espera
 exports.getRecetasEnEspera = async (req, res) => {
   try {
     const recetas = await Receta.findAll({
@@ -198,8 +184,6 @@ exports.getRecetasEnEspera = async (req, res) => {
   }
 };
 
-
-// Cargar receta con imagen
 exports.uploadWithImage = async (req, res) => {
   try {
     const { idUsuario, nombreReceta, descripcionReceta, porciones, cantidadPersonas, idTipo } = req.body;
@@ -228,7 +212,6 @@ exports.uploadWithImage = async (req, res) => {
   }
 };
 
-// Obtener todas las recetas de un usuario por su ID
 exports.getRecetasPorUsuario = async (req, res) => {
   try {
     const { idUsuario } = req.params;
@@ -286,7 +269,6 @@ exports.updateWithImage = async (req, res) => {
   }
 };
 
-// Obtener recetas por idTipo (tipo de comida)
 exports.getRecetasPorTipo = async (req, res) => {
   try {
     const { idTipo } = req.params;
@@ -307,8 +289,6 @@ exports.getRecetasPorTipo = async (req, res) => {
   }
 };
 
-
-// Verificar si el usuario ya tiene una receta con ese nombre
 exports.verificarRecetaPorNombreYUsuario = async (req, res) => {
   try {
     const { idUsuario, nombreReceta } = req.query;
@@ -320,7 +300,7 @@ exports.verificarRecetaPorNombreYUsuario = async (req, res) => {
     const recetaExistente = await Receta.findOne({
       where: {
         idUsuario,
-        nombreReceta: { [Op.like]: nombreReceta } // o [Op.iLike] si usás PostgreSQL
+        nombreReceta: { [Op.like]: nombreReceta } 
       },
       attributes: ['idReceta', 'nombreReceta']
     });

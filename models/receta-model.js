@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db-config'); // ESTA LÍNEA ES CLAVE
+const sequelize = require('../config/db-config'); 
 
 const Receta = sequelize.define('Receta', {
   idReceta: {

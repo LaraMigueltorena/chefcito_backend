@@ -23,16 +23,14 @@ exports.getById = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const { usuarioId } = req.body;
-
-    // ✅ Evitar duplicados
+    
     const yaExiste = await Administrador.findOne({ where: { usuarioId } });
     if (yaExiste) {
       return res.status(400).json({ error: 'Este usuario ya es administrador' });
     }
 
     const nuevo = await Administrador.create({ usuarioId });
-
-    // 🔁 Cambiar el rol del usuario a 'admin'
+    
     await Usuario.update({ rol: 'admin' }, { where: { idUsuario: usuarioId } });
 
     res.status(201).json(nuevo);
@@ -56,8 +54,7 @@ exports.delete = async (req, res) => {
   try {
     const item = await Administrador.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: 'No encontrado' });
-
-    // ⚠️ Al eliminar el admin, opcionalmente bajás el rol
+    
     await Usuario.update({ rol: 'usuario' }, { where: { idUsuario: item.usuarioId } });
     await item.destroy();
 

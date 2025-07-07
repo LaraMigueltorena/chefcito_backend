@@ -5,10 +5,9 @@ const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-const codigosVerificacion = {}; // temporal en memoria
+const codigosVerificacion = {}; 
 const codigosRecuperacion = {};
 
-// GET /usuarios
 exports.getAllUsuarios = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll();
@@ -19,7 +18,6 @@ exports.getAllUsuarios = async (req, res) => {
   }
 };
 
-// GET /usuarios/:id
 exports.getUsuarioById = async (req, res) => {
   try {
     const usuario = await Usuario.findByPk(req.params.id);
@@ -30,7 +28,6 @@ exports.getUsuarioById = async (req, res) => {
   }
 };
 
-// POST /usuarios
 exports.createUsuario = async (req, res) => {
   try {
     const { password, ...otrosCampos } = req.body;
@@ -48,12 +45,10 @@ exports.createUsuario = async (req, res) => {
   }
 };
 
-// PUT /usuarios/:id
 exports.updateUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Solo el dueño o un admin pueden modificar el usuario
+    
     if (parseInt(id) !== req.user.id && req.user.rol !== 'admin') {
       return res.status(403).json({ error: 'Acceso denegado' });
     }
@@ -62,8 +57,7 @@ exports.updateUsuario = async (req, res) => {
     if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
 
     const updateData = { ...req.body };
-
-    // 🚫 No permitir cambiar rol si no es admin
+    
     if (updateData.rol && req.user.rol !== 'admin') {
       return res.status(403).json({ error: 'No tenés permiso para cambiar el rol' });
     }
@@ -79,7 +73,6 @@ exports.updateUsuario = async (req, res) => {
   }
 };
 
-// DELETE /usuarios/:id
 exports.deleteUsuario = async (req, res) => {
   try {
     const usuario = await Usuario.findByPk(req.params.id);
@@ -92,7 +85,6 @@ exports.deleteUsuario = async (req, res) => {
   }
 };
 
-//POST /usuarios/sugerencias-alias
 exports.sugerenciasAlias = async (req, res) => {
   const { base } = req.body;
 
@@ -116,7 +108,6 @@ exports.sugerenciasAlias = async (req, res) => {
   return res.json({ sugerencias });
 };
 
-// POST /usuarios/verificar-email
 exports.verificarEmailYAlias = async (req, res) => {
   const { mail, nickname } = req.body;
 
@@ -154,7 +145,6 @@ exports.verificarEmailYAlias = async (req, res) => {
   }
 };
 
-// POST /usuarios/verificar-codigo
 exports.verificarCodigo = async (req, res) => {
   const { mail, codigo } = req.body;
 
@@ -166,7 +156,6 @@ exports.verificarCodigo = async (req, res) => {
   return res.status(400).json({ error: 'Código incorrecto' });
 };
 
-// POST /usuarios/recuperar-codigo
 exports.enviarCodigoRecuperacion = async (req, res) => {
   const { mail } = req.body;
 
@@ -175,7 +164,7 @@ exports.enviarCodigoRecuperacion = async (req, res) => {
     if (!usuario) return res.status(404).json({ error: 'Correo no registrado' });
 
     const codigo = Math.floor(1000 + Math.random() * 9000);
-    const vencimiento = Date.now() + 30 * 60 * 1000; // 30 minutos
+    const vencimiento = Date.now() + 30 * 60 * 1000; 
 
     codigosRecuperacion[mail] = { codigo, vencimiento };
 
@@ -203,7 +192,6 @@ exports.enviarCodigoRecuperacion = async (req, res) => {
   }
 };
 
-// POST /usuarios/verificar-codigo-recuperacion
 exports.verificarCodigoRecuperacion = async (req, res) => {
   const { mail, codigo } = req.body;
 
@@ -225,7 +213,6 @@ exports.verificarCodigoRecuperacion = async (req, res) => {
   return res.json({ verificado: true });
 };
 
-// POST /usuarios/reset-password
 exports.resetPassword = async (req, res) => {
   const { mail, nuevaPassword } = req.body;
 
@@ -244,7 +231,6 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-// POST /usuarios/change-password
 exports.changePassword = async (req, res) => {
   const { actualPassword, nuevaPassword } = req.body;
   const usuarioId = req.user.id;
@@ -266,7 +252,6 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-// POST /usuarios/login
 exports.login = async (req, res) => {
   const { mail, password } = req.body;
 

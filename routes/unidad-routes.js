@@ -3,7 +3,7 @@ const router = express.Router();
 const ctrl = require('../controllers/unidad-controller');
 
 router.get('/', ctrl.getAll);
-router.get('/buscar', ctrl.searchByDescripcion); // 🆕 Nueva ruta de búsqueda
+router.get('/buscar', ctrl.searchByDescripcion); 
 router.get('/:id', ctrl.getById);
 router.post('/', ctrl.create);
 router.put('/:id', ctrl.update);

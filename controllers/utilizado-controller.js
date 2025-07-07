@@ -1,7 +1,6 @@
 const Utilizado = require('../models/utilizado-model');
 const Unidad = require('../models/unidad-model');
 
-// Obtener todos los registros utilizados
 exports.getAll = async (req, res) => {
   try {
     const data = await Utilizado.findAll();
@@ -11,13 +10,11 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// Obtener por ID
 exports.getById = async (req, res) => {
   const item = await Utilizado.findByPk(req.params.id);
   item ? res.json(item) : res.status(404).json({ error: 'No encontrado' });
 };
 
-// Crear un nuevo registro en utilizados
 exports.create = async (req, res) => {
   try {
     const {
@@ -28,7 +25,6 @@ exports.create = async (req, res) => {
       observaciones,
     } = req.body;
 
-    // Buscar descripción de la unidad
     const unidad = await Unidad.findByPk(idUnidad);
     if (!unidad) {
       return res.status(400).json({ error: 'Unidad no encontrada' });
@@ -39,7 +35,7 @@ exports.create = async (req, res) => {
       idIngrediente,
       cantidad,
       idUnidad,
-      unidad: unidad.descripcion, // ✅ Guardamos el texto
+      unidad: unidad.descripcion, 
       observaciones,
     });
 
@@ -50,7 +46,6 @@ exports.create = async (req, res) => {
   }
 };
 
-// Actualizar un registro
 exports.update = async (req, res) => {
   const item = await Utilizado.findByPk(req.params.id);
   if (!item) return res.status(404).json({ error: 'No encontrado' });
@@ -58,7 +53,6 @@ exports.update = async (req, res) => {
   res.json({ mensaje: 'Actualizado', item });
 };
 
-// Eliminar un registro
 exports.delete = async (req, res) => {
   const item = await Utilizado.findByPk(req.params.id);
   if (!item) return res.status(404).json({ error: 'No encontrado' });
@@ -66,13 +60,12 @@ exports.delete = async (req, res) => {
   res.json({ mensaje: 'Eliminado' });
 };
 
-// Obtener ingredientes utilizados por idReceta
 exports.getByRecetaId = async (req, res) => {
   try {
     const { idReceta } = req.params;
     const data = await Utilizado.findAll({
       where: { idReceta },
-      include: ['Ingrediente'], // Asegurate que la relación esté definida en el modelo
+      include: ['Ingrediente'], 
     });
     res.json(data);
   } catch (err) {
@@ -81,7 +74,6 @@ exports.getByRecetaId = async (req, res) => {
   }
 };
 
-// Obtener todas las recetas que usan un ingrediente específico
 exports.getRecetasPorIngrediente = async (req, res) => {
   try {
     const { idIngrediente } = req.params;
@@ -92,8 +84,8 @@ exports.getRecetasPorIngrediente = async (req, res) => {
 
     const utilizados = await Utilizado.findAll({
       where: { idIngrediente },
-      attributes: ['idReceta'], // Solo traemos el campo idReceta
-      group: ['idReceta'], // Agrupamos para evitar duplicados
+      attributes: ['idReceta'], 
+      group: ['idReceta'], 
     });
 
     const recetaIds = utilizados.map(u => u.idReceta);

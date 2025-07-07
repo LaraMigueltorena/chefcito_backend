@@ -19,14 +19,10 @@ router.get('/en-espera', recetaController.getRecetasEnEspera);
 router.get('/ultimas', recetaController.getUltimasRecetas);
 router.get('/:id', recetaController.getRecetaPorId);
 router.get('/', recetaController.getAllRecetas);
-
-router.post('/', recetaController.createReceta); // ruta vieja sin imagen
-router.post('/upload', upload.single('fotoPrincipal'), recetaController.uploadWithImage); // crear con imagen
-router.put('/:id', recetaController.updateReceta); // actualizar sin imagen
-
-// ✅ NUEVA ruta para actualizar con imagen
+router.post('/', recetaController.createReceta); 
+router.post('/upload', upload.single('fotoPrincipal'), recetaController.uploadWithImage); 
+router.put('/:id', recetaController.updateReceta); 
 router.put('/upload/:id', upload.single('fotoPrincipal'), recetaController.updateWithImage);
-
 router.delete('/:id', recetaController.deleteReceta);
 router.get('/por-tipo/:idTipo', recetaController.getRecetasPorTipo);
 
