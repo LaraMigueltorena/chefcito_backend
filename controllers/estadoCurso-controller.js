@@ -3,7 +3,7 @@ const sequelize = require('../config/db-config');
 const Curso = require('../models/curso-model');
 const CronogramaCurso = require('../models/cronogramaCurso-model');
 const EstadoCurso = require('../models/estadoCurso-model');
-const Sede = require('../models/sede-model'); // ✅ Asegúrate de tenerlo importado
+const Sede = require('../models/sede-model'); // ✅
 
 exports.getAll = async (req, res) => {
   try {
@@ -73,7 +73,6 @@ exports.delete = async (req, res) => {
   }
 };
 
-
 exports.getByAlumno = async (req, res) => {
   try {
     const data = await EstadoCurso.findAll({
@@ -125,7 +124,7 @@ exports.getEnCurso = async (req, res) => {
       },
       include: [{
         model: CronogramaCurso,
-        include: [Curso, Sede] // ✅ Incluye la Sede
+        include: [Curso, Sede]
       }]
     });
 
@@ -147,7 +146,7 @@ exports.getFinalizados = async (req, res) => {
       },
       include: [{
         model: CronogramaCurso,
-        include: [Curso, Sede] // ✅ Incluye la Sede también para finalizados
+        include: [Curso, Sede]
       }]
     });
 
@@ -164,28 +163,21 @@ exports.inscribirAlumno = async (req, res) => {
   try {
     await sequelize.transaction(async (t) => {
       const cronograma = await CronogramaCurso.findByPk(idCronograma, { transaction: t });
-      if (!cronograma) {
-        throw new Error('Cronograma no encontrado');
-      }
+      if (!cronograma) throw new Error('Cronograma no encontrado');
 
       if (cronograma.vacantesDisponibles <= 0) {
         throw new Error('No hay vacantes disponibles');
       }
 
-      // ¿Ya existe?
       const yaExiste = await EstadoCurso.findOne({
         where: { idAlumno, idCronograma },
         transaction: t,
       });
-      if (yaExiste) {
-        throw new Error('Ya existe inscripción para este alumno y cronograma');
-      }
+      if (yaExiste) throw new Error('Ya existe inscripción para este alumno y cronograma');
 
-      // 1️⃣ Restar vacante
       cronograma.vacantesDisponibles -= 1;
       await cronograma.save({ transaction: t });
 
-      // 2️⃣ Crear EstadoCurso
       await EstadoCurso.create(
         { idAlumno, idCronograma, estado: 'en_curso' },
         { transaction: t }
@@ -196,5 +188,26 @@ exports.inscribirAlumno = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: err.message || 'Error al inscribir alumno' });
+  }
+};
+
+// 🔥 NUEVO: Buscar idEstadoCurso por alumno + cronograma
+exports.getByAlumnoCronograma = async (req, res) => {
+  const { alumno, cronograma } = req.query;
+
+  try {
+    const estado = await EstadoCurso.findOne({
+      where: {
+        idAlumno: alumno,
+        idCronograma: cronograma
+      }
+    });
+
+    if (!estado) return res.status(404).json({ error: 'No encontrado' });
+
+    res.json({ idEstadoCurso: estado.idEstadoCurso });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al buscar EstadoCurso' });
   }
 };

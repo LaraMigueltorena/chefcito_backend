@@ -8,6 +8,9 @@ router.get('/disponibles/:idAlumno', estadoCursoController.getDisponibles);
 router.get('/en-curso/:idAlumno', estadoCursoController.getEnCurso);
 router.get('/finalizados/:idAlumno', estadoCursoController.getFinalizados);
 
+// NUEVO: Buscar idEstadoCurso con alumno + cronograma
+router.get('/by-alumno-cronograma', estadoCursoController.getByAlumnoCronograma);
+
 // ✅ Inscribir alumno con update de vacante
 router.put('/inscribir/:idAlumno/:idCronograma', estadoCursoController.inscribirAlumno);
 

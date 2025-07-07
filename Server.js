@@ -28,7 +28,7 @@ app.use('/api/conversiones', require('./routes/conversion-routes'));
 app.use('/api/alumnos', require('./routes/alumno-routes'));
 app.use('/api/calificaciones', require('./routes/calificacion-routes'));
 app.use('/api/fotos', require('./routes/foto-routes'));
-app.use('/api/asistencia-cursos', require('./routes/asistenciaCurso-routes'));
+app.use('/api/asistencia-curso', require('./routes/asistenciaCurso-routes'));
 app.use('/api/cronograma-cursos', require('./routes/cronogramaCurso-routes'));
 app.use('/api/sedes', require('./routes/sede-routes'));
 app.use('/api/cursos', require('./routes/curso-routes'));
