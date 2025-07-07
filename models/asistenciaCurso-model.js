@@ -5,7 +5,8 @@ const AsistenciaCurso = sequelize.define('AsistenciaCurso', {
   idAsistencia: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   idAlumno: DataTypes.INTEGER,
   idCronograma: DataTypes.INTEGER,
-  fecha: DataTypes.DATE
+  fecha: DataTypes.DATEONLY,
+  estado: DataTypes.STRING
 }, {
   tableName: 'asistenciaCursos',
   timestamps: false

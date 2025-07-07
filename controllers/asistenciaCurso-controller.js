@@ -36,3 +36,19 @@ exports.delete = async (req, res) => {
   await item.destroy();
   res.json({ mensaje: 'Eliminado' });
 };
+
+exports.getByAlumnoCronograma = async (req, res) => {
+  const { alumno, cronograma } = req.query;
+  try {
+    const datos = await AsistenciaCurso.findAll({
+      where: {
+        idAlumno: alumno,
+        idCronograma: cronograma
+      }
+    });
+    res.json(datos);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error filtrando asistencia' });
+  }
+};
