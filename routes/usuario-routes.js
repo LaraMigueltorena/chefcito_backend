@@ -25,4 +25,7 @@ router.post('/change-password', verifyToken, usuarioController.changePassword);
 router.post('/recuperar-codigo', usuarioController.enviarCodigoRecuperacion);
 router.post('/verificar-codigo-recuperacion', usuarioController.verificarCodigoRecuperacion);
 
+router.patch('/:id/conexion', usuarioController.actualizarConexion);
+
+
 module.exports = router;
